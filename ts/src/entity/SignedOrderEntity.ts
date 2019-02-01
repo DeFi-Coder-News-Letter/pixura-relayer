@@ -8,49 +8,49 @@ export const signedOrderEntity = new EntitySchema<SignedOrderModel>({
     columns: {
         hash: {
             primary: true,
-            type: 'varchar',
+            type: 'text',
         },
         senderAddress: {
-            type: 'varchar',
+            type: 'text',
         },
         makerAddress: {
-            type: 'varchar',
+            type: 'text',
         },
         takerAddress: {
-            type: 'varchar',
+            type: 'text',
         },
         makerAssetData: {
-            type: 'varchar',
+            type: 'text',
         },
         takerAssetData: {
-            type: 'varchar',
+            type: 'text',
         },
         exchangeAddress: {
-            type: 'varchar',
+            type: 'text',
         },
         feeRecipientAddress: {
-            type: 'varchar',
+            type: 'text',
         },
         expirationTimeSeconds: {
             type: 'int',
         },
         makerFee: {
-            type: 'varchar',
+            type: 'double precision',
         },
         takerFee: {
-            type: 'varchar',
+            type: 'double precision',
         },
         makerAssetAmount: {
-            type: 'varchar',
+            type: 'double precision',
         },
         takerAssetAmount: {
-            type: 'varchar',
+            type: 'double precision',
         },
         salt: {
-            type: 'varchar',
+            type: 'text',
         },
         signature: {
-            type: 'varchar',
+            type: 'text',
         },
     },
 });
