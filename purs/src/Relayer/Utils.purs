@@ -27,25 +27,43 @@ queryGraphQlApi
   => String 
   -> GraphQlQuery a 
   -> m (GraphQlQueryResponse a)
-queryGraphQlApi url (GraphQlQuery gqlBody _) = do
-  res <- liftAff $ AX.post ResponseFormat.string url (RequestBody.json (J.encodeJson gqlBody))
-  either throwError pure $ decodeWithError res
+queryGraphQlApi url (GraphQlQuery gqlBody _) = post url gqlBody
+
+  -- eres <- liftAff <<< try $ AX.post ResponseFormat.string url (RequestBody.json (J.encodeJson gqlBody))
+  -- case eres of
+  --   Left err -> throwError $ HttpConnectionError err
+    
+  -- either throwError pure $ decodeWithError res
+
+post 
+  :: forall a b m. 
+     J.EncodeJson a 
+  => J.DecodeJson b 
+  => MonadAff m 
+  => MonadThrow RelayerError m
+  => String 
+  -> a 
+  -> m b
+post url body = do
+  eres <- liftAff (try $ AX.post ResponseFormat.string url (RequestBody.json (J.encodeJson body)))
+  case eres of
+    Left err -> throwError <<< HttpConnectionError <<< show $ err
+    Right res -> either throwError pure $ decodeWithError (res)
 
 decodeWithError 
   :: forall a.
      DecodeJson a
   => AX.Response (Either AX.ResponseFormatError String)
   -> Either RelayerError a
-decodeWithError res 
-  | statusOk res.status = case res.body of
-      Left err -> Left <<< HttpResponseFormatError $ AX.printResponseFormatError err
-      Right jsonStr -> 
-        let jsonObj = J.fromString $ jsonStr
-            eobj = J.decodeJson jsonObj
-        in case eobj  of 
-             Left err -> Left (InvalidJsonBody ("Error:" <> err <> ": JsonBody" <> jsonStr))
-             Right obj -> Right obj
-  | otherwise = Left (HttpError res.status res.statusText)
+decodeWithError res = case res.body of
+    Left err -> Left <<< HttpResponseFormatError $ AX.printResponseFormatError err
+    Right bodyStr | statusOk res.status ->
+                      let jsonObj = J.fromString $ bodyStr
+                          eobj = J.decodeJson jsonObj
+                      in case eobj  of 
+                           Left err -> Left (InvalidJsonBody ("Error:" <> err <> ": JsonBody" <> bodyStr))
+                           Right obj -> Right obj
+                  | otherwise -> Left (HttpError res.status (res.statusText <> " : " <> bodyStr))
 
 statusOk :: StatusCode -> Boolean
 statusOk (StatusCode n) = n >= 200 && n < 300

@@ -19,6 +19,7 @@ import Effect.Aff (Error, error)
 data RelayerError = InvalidJsonBody String
                   | HttpError StatusCode String
                   | HttpResponseFormatError String
+                  | HttpConnectionError String
                   | GraphQlNoDataError String
 
 derive instance eqRelayerError :: Eq RelayerError
@@ -27,7 +28,8 @@ instance showInsertRelayerError :: Show RelayerError where
   show = genericShow
 
 handleError :: forall a m. (MonadError Error m) => RelayerError -> m a
-handleError (HttpResponseFormatError err) = throwError <<< error $ "Failed to format http repsonse: " <> err
-handleError (InvalidJsonBody err) = throwError <<< error $ "Failed to parse Json body: " <> err
 handleError (HttpError (StatusCode sc) err) = throwError <<< error $ "Http Error, status code: " <> show sc <> ", Error: " <> err
+handleError (HttpResponseFormatError err) = throwError <<< error $ "Failed to format http repsonse: " <> err
+handleError (HttpConnectionError err) = throwError <<< error $ "Failed to connect to remote host: " <> err
+handleError (InvalidJsonBody err) = throwError <<< error $ "Failed to parse Json body: " <> err
 handleError (GraphQlNoDataError err) = throwError <<< error $ "No data field returned from GraphQlQuery, errors found: " <> err

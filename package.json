@@ -7,7 +7,7 @@
     "license": "Apache-2.0",
     "scripts": {
         "prettier": "yarn prettier:js && yarn prettier:ts",
-        "build": "yarn build:purs && yarn build:generate-types && yarn build:ts && shx rm -rf js && shx cp -r ts/lib/ js",
+        "build": "yarn build:purs && yarn build:generate-types && yarn build:ts",
         "clean": "rm -rf bower_components/ output/ ts/src/purs/ ts/lib/",
         "prettier:js": "prettier --write 'js/**/*.js' --config .prettierrc",
         "start:js": "node -r dotenv/config js/lib/index.js",
