@@ -3,13 +3,13 @@ module Relayer.Queries (buildInsertEthereumAddress) where
 import Prelude
 import Type.Proxy (Proxy(..))
 
-import Relayer.Types (GQLBody(..), GraphQLQuery(..), InsertEthereumAddressResponse)
+import Relayer.Types (GQLBody(..), GraphQlQuery(..), InsertEthereumAddressResponse)
 
 wrapDoubleQuotes :: String -> String
 wrapDoubleQuotes str = "\"" <> str <> "\""
 
-buildInsertEthereumAddress :: forall r. { address :: String | r} -> GraphQLQuery InsertEthereumAddressResponse
-buildInsertEthereumAddress o = GraphQLQuery (GQLBody { query: query }) (Proxy :: Proxy InsertEthereumAddressResponse)
+buildInsertEthereumAddress :: forall r. { address :: String | r} -> GraphQlQuery InsertEthereumAddressResponse
+buildInsertEthereumAddress o = GraphQlQuery (GQLBody { query: query }) (Proxy :: Proxy InsertEthereumAddressResponse)
   where
     query = """
     mutation {
@@ -28,7 +28,7 @@ buildInsertEthereumAddress o = GraphQLQuery (GQLBody { query: query }) (Proxy ::
     }
     """
 
--- buildInsertEthereumAddress :: forall i. (address :: String | i) -> GraphQLQuery GQLBody  r
+-- buildInsertEthereumAddress :: forall i. (address :: String | i) -> GraphQlQuery GQLBody  r
 -- buildInsertEthereumAddress address = print (query address)
 --   where
 --     query = s """

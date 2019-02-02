@@ -1,18 +1,33 @@
-module Relayer.Pixura (insertEthereumAddress) where
+module Relayer.Pixura (insertEthereumAddress, insertEtherAddressFn) where
 
 import Prelude
 
+import Control.Monad.Error.Class (class MonadThrow)
 import Data.Maybe (Maybe(..))
-import Effect.Aff (Aff, error, throwError)
+import Effect.Aff (joinFiber, throwError)
+import Effect.Aff.Class (class MonadAff)
+import Effect.Uncurried (EffectFn1, mkEffectFn1)
+import Relayer.Errors (RelayerError(..))
 import Relayer.Queries (buildInsertEthereumAddress)
-import Relayer.Types (EthereumAddress, GraphQLQueryResponse(..), InsertEthereumAddressResponse)
+import Relayer.Types (EthereumAddress, GraphQlQueryResponse(..), InsertEthereumAddressResponse, runRelayer, fromAff, Promise)
 import Relayer.Utils (queryGraphQlApi)
 
-insertEthereumAddress :: EthereumAddress -> Aff InsertEthereumAddressResponse
+
+insertEtherAddressFn :: EffectFn1 EthereumAddress (Promise InsertEthereumAddressResponse)
+insertEtherAddressFn = mkEffectFn1 fn
+  where
+    fn a = (fromAff <<< joinFiber) =<< runRelayer (insertEthereumAddress a)
+
+insertEthereumAddress 
+  :: forall m. MonadAff m 
+  => MonadThrow RelayerError m
+  =>  EthereumAddress 
+  -> m InsertEthereumAddressResponse
 insertEthereumAddress ea = do
-  GraphQLQueryResponse gqlRes <- queryGraphQlApi "https://ropsten.pixura.io/graphql" (buildInsertEthereumAddress ea)
+  GraphQlQueryResponse gqlRes <- queryGraphQlApi "https://ropsten.pixura.io/graphql" (buildInsertEthereumAddress ea)
   case gqlRes.data of
-    Nothing -> throwError <<< error $ show gqlRes.errors
+    Nothing -> throwError <<< GraphQlNoDataError $ show gqlRes.errors
     Just insertRes -> pure insertRes
+
 
 

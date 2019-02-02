@@ -26,7 +26,8 @@
     "purescript-generics-rep": "^6.1.1",
     "purescript-exceptions": "^4.0.0",
     "purescript-argonaut-generic": "^4.0.0",
-    "purescript-aff-promise": "^2.0.1"
+    "purescript-aff-promise": "^2.0.1",
+    "purescript-has-js-rep": "^0.1.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"

@@ -3,20 +3,49 @@ module Relayer.Utils (queryGraphQlApi) where
 import Prelude
 
 import Affjax as AX
-import Affjax.RequestBody (RequestBody(..))
 import Affjax.RequestBody as RequestBody
-import Affjax.RequestHeader (RequestHeader(..))
-import Affjax.ResponseFormat (ResponseFormat(..))
 import Affjax.ResponseFormat as ResponseFormat
+import Affjax.StatusCode (StatusCode(..))
+import Control.Monad.Error.Class (class MonadThrow, try)
+import Control.Monad.Except (except)
+import Control.Monad.Gen (resize)
+import Data.Argonaut (class DecodeJson)
 import Data.Argonaut as J
 import Data.Either (Either(..), either)
-import Data.HTTP.Method (Method(..))
-import Effect.Aff (Aff, error, throwError)
-import Relayer.Types (GraphQLQuery(..), GraphQLQueryResponse(..))
+import Effect.Aff (throwError)
+import Effect.Aff.Class (class MonadAff, liftAff)
+import Effect.Class.Console (logShow)
+import Node.Stream (onFinish)
+import Relayer.Errors (RelayerError(..))
+import Relayer.Types (GraphQlQuery(..), GraphQlQueryResponse)
 
-queryGraphQlApi :: forall a. (J.DecodeJson a) => String -> GraphQLQuery a -> Aff (GraphQLQueryResponse a)
-queryGraphQlApi url (GraphQLQuery gqlBody _) = do
-  res <- AX.post ResponseFormat.json url (RequestBody.json (J.encodeJson gqlBody))
-  case res.body of
-    Left err -> throwError <<< error $ "POST /api response failed to decode: " <> AX.printResponseFormatError err
-    Right json -> either (throwError <<< error) pure  (J.decodeJson json)
+queryGraphQlApi 
+  :: forall a m. 
+     J.DecodeJson a 
+  => MonadAff m 
+  => MonadThrow RelayerError m
+  => String 
+  -> GraphQlQuery a 
+  -> m (GraphQlQueryResponse a)
+queryGraphQlApi url (GraphQlQuery gqlBody _) = do
+  res <- liftAff $ AX.post ResponseFormat.string url (RequestBody.json (J.encodeJson gqlBody))
+  either throwError pure $ decodeWithError res
+
+decodeWithError 
+  :: forall a.
+     DecodeJson a
+  => AX.Response (Either AX.ResponseFormatError String)
+  -> Either RelayerError a
+decodeWithError res 
+  | statusOk res.status = case res.body of
+      Left err -> Left <<< HttpResponseFormatError $ AX.printResponseFormatError err
+      Right jsonStr -> 
+        let jsonObj = J.fromString $ jsonStr
+            eobj = J.decodeJson jsonObj
+        in case eobj  of 
+             Left err -> Left (InvalidJsonBody ("Error:" <> err <> ": JsonBody" <> jsonStr))
+             Right obj -> Right obj
+  | otherwise = Left (HttpError res.status res.statusText)
+
+statusOk :: StatusCode -> Boolean
+statusOk (StatusCode n) = n >= 200 && n < 300

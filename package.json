@@ -7,15 +7,17 @@
     "license": "Apache-2.0",
     "scripts": {
         "prettier": "yarn prettier:js && yarn prettier:ts",
-        "build": "yarn build:ts && shx rm -rf js && shx cp -r ts/lib/ js",
+        "build": "yarn build:purs && yarn build:generate-types && yarn build:ts && shx rm -rf js && shx cp -r ts/lib/ js",
+        "clean": "rm -rf bower_components/ output/ ts/src/purs/ ts/lib/",
         "prettier:js": "prettier --write 'js/**/*.js' --config .prettierrc",
         "start:js": "node -r dotenv/config js/lib/index.js",
         "build:ts": "tsc -p ts/tsconfig.json",
         "build:purs": "mkdir -p ./ts/src/purs && pulp build --src-path ./purs/src/ -o ./ts/src/purs/",
-        "build:generate-types": "mkdir -p ./ts/src/purs && pulp run --src-path ./purs/src -m Generate",
+        "build:generate-types": "mkdir -p ./ts/src/purs && pulp run --src-path ./purs/src -m Generate && yarn prettier:ts",
         "watch:ts": "tsc -w -p ts/tsconfig.json",
         "prettier:ts": "prettier --write 'ts/**/*.ts' --config .prettierrc",
         "start:ts": "node -r dotenv/config ts/lib/index.js",
+        "postinstall": "bower install",
         "lint:ts": "tslint --project ts --format stylish"
     },
     "devDependencies": {
