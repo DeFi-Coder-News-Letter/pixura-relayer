@@ -56,6 +56,8 @@ runRelayer :: forall a. Relayer a -> Effect (Fiber a)
 runRelayer (Relayer f) = launchAff (errH =<< (runExceptT f))
   where 
     errH = either handleError pure
+
+
 -------------------------------------------------------------------------------
 -- | SignedOrder
 -------------------------------------------------------------------------------
@@ -85,6 +87,7 @@ instance encodeJsonGQLBody :: EncodeJson GQLBody where
   encodeJson a = genericEncodeJson a
 instance decodeJsonGQLBody :: DecodeJson GQLBody where
   decodeJson a = genericDecodeJson a
+
 -------------------------------------------------------------------------------
 -- | GraphQlQuery
 -------------------------------------------------------------------------------

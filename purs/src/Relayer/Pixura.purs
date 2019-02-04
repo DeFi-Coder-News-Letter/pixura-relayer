@@ -24,7 +24,7 @@ insertEthereumAddress
   =>  EthereumAddress 
   -> m InsertEthereumAddressResponse
 insertEthereumAddress ea = do
-  GraphQlQueryResponse gqlRes <- queryGraphQlApi "https://ropsten-api.pixura.io/graphql" (buildInsertEthereumAddress ea)
+  GraphQlQueryResponse gqlRes <- queryGraphQlApi (buildInsertEthereumAddress ea)
   case gqlRes.data of
     Nothing -> throwError <<< GraphQlNoDataError $ show gqlRes.errors
     Just insertRes -> pure insertRes

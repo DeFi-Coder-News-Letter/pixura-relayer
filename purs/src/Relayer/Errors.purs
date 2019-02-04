@@ -16,6 +16,7 @@ import Effect.Aff (Error, error)
 -------------------------------------------------------------------------------
 -- | Errors
 -------------------------------------------------------------------------------
+-- | All possible errors within the relayer
 data RelayerError = InvalidJsonBody String
                   | HttpError StatusCode String
                   | HttpResponseFormatError String
@@ -27,6 +28,11 @@ derive instance genericRelayerError :: Generic RelayerError _
 instance showInsertRelayerError :: Show RelayerError where
   show = genericShow
 
+-------------------------------------------------------------------------------
+-- | handleError
+-------------------------------------------------------------------------------
+-- | General error handler for the RelayerError. Maps from RelayerError to 
+--   Error.
 handleError :: forall a m. (MonadError Error m) => RelayerError -> m a
 handleError (HttpError (StatusCode sc) err) = throwError <<< error $ "Http Error, status code: " <> show sc <> ", Error: " <> err
 handleError (HttpResponseFormatError err) = throwError <<< error $ "Failed to format http repsonse: " <> err
