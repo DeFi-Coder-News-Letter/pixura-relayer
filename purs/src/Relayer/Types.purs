@@ -3,8 +3,8 @@ module Relayer.Types
   , EthereumAddress(..)
   , GQLBody(..)
   , GraphQlQuery(..)
-  , InsertEthereumAddressResponse(..)
   , GraphQlQueryResponse(..)
+  , GraphQlQueryResponseError(..)
   , Relayer(..)
   , runRelayer
   , Promise(..)
@@ -75,18 +75,9 @@ type EthereumAddress = {
 -------------------------------------------------------------------------------
 -- | GQLBody
 -------------------------------------------------------------------------------
-newtype GQLBody = GQLBody {
+type GQLBody = {
   query :: String
 }
-derive instance genericGQLBody :: Generic GQLBody _
-instance showGQLBody :: Show GQLBody where
-  show = genericShow
-instance eqGQLBody :: Eq GQLBody where
-  eq = genericEq
-instance encodeJsonGQLBody :: EncodeJson GQLBody where
-  encodeJson a = genericEncodeJson a
-instance decodeJsonGQLBody :: DecodeJson GQLBody where
-  decodeJson a = genericDecodeJson a
 
 -------------------------------------------------------------------------------
 -- | GraphQlQuery
@@ -102,49 +93,39 @@ instance eqGraphQlQuery :: (Eq a) => Eq (GraphQlQuery a) where
   eq = genericEq
 
 -------------------------------------------------------------------------------
+-- | GraphQlQueryResponseError
+-------------------------------------------------------------------------------
+type GraphQlQueryResponseError =  {
+  message :: String,
+  locations :: Array {
+    line :: Int,
+    column :: Int
+  },
+  path :: Array String
+}
+-------------------------------------------------------------------------------
 -- | GraphQlQueryResponse
 -------------------------------------------------------------------------------
-newtype GraphQlQueryResponse a = GraphQlQueryResponse {
+type GraphQlQueryResponse a =  {
   data :: Maybe a,
-  errors :: Maybe (Array String)
+  errors :: Maybe (Array GraphQlQueryResponseError)
 }
 
-derive instance genericGraphQlQueryResponse :: Generic (GraphQlQueryResponse a) _
 
-instance showGraphQlQueryResponse :: (Show a) => Show (GraphQlQueryResponse a) where
-  show = genericShow
+-- derive instance genericInsertEthereumAddressResponse :: Generic InsertEthereumAddressResponse _
 
-instance eqGraphQlQueryResponse :: (Eq a) => Eq (GraphQlQueryResponse a) where
-  eq = genericEq
+-- instance showInsertEthereumAddressResponse :: Show InsertEthereumAddressResponse where
+--   show = genericShow
 
-instance encodeJsonGraphQlQueryResponse :: (EncodeJson a) => EncodeJson (GraphQlQueryResponse a) where
-  encodeJson a = genericEncodeJson a
-instance decodeJsonGraphQlQueryResponse :: (DecodeJson a) => DecodeJson (GraphQlQueryResponse a) where
-  decodeJson a = genericDecodeJson a
+-- instance eqInsertEthereumAddressResponse ::  Eq InsertEthereumAddressResponse  where
+--   eq = genericEq
 
--------------------------------------------------------------------------------
--- | InsertEthereumAddressResponse
--------------------------------------------------------------------------------
-newtype InsertEthereumAddressResponse = InsertEthereumAddressResponse {
-  ethereumAddress :: {
-    address :: String,
-    createdAt :: String
-  }
-}
-derive instance genericInsertEthereumAddressResponse :: Generic InsertEthereumAddressResponse _
-
-instance showInsertEthereumAddressResponse :: Show InsertEthereumAddressResponse where
-  show = genericShow
-
-instance eqInsertEthereumAddressResponse ::  Eq InsertEthereumAddressResponse  where
-  eq = genericEq
-
-instance encodeJsonInsertEthereumAddressResponse :: EncodeJson InsertEthereumAddressResponse where
-  encodeJson a = genericEncodeJson a
-instance decodeJsonInsertEthereumAddressResponse :: DecodeJson InsertEthereumAddressResponse where
-  decodeJson a = genericDecodeJson a
-instance hasJSRepEthereumAddressResponse :: HasJSRep InsertEthereumAddressResponse
-derive newtype instance hasTSRepEthereumAddressResponse :: HasTSRep InsertEthereumAddressResponse
+-- instance encodeJsonInsertEthereumAddressResponse :: EncodeJson InsertEthereumAddressResponse where
+--   encodeJson a = genericEncodeJson a
+-- instance decodeJsonInsertEthereumAddressResponse :: DecodeJson InsertEthereumAddressResponse where
+--   decodeJson a = genericDecodeJson a
+-- instance hasJSRepEthereumAddressResponse :: HasJSRep InsertEthereumAddressResponse
+-- derive newtype instance hasTSRepEthereumAddressResponse :: HasTSRep InsertEthereumAddressResponse
 
 
 newtype Promise a = Promise (Promise.Promise a)

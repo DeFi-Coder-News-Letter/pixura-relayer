@@ -1,5 +1,6 @@
 module Relayer.Config 
   ( getGraphQlApiUrl
+  , getPixuraApiKey
   ) where
 import Prelude
 
@@ -17,17 +18,27 @@ getGraphQlApiUrl
   :: forall m. 
      MonadEffect m
   => m URL
-getGraphQlApiUrl = getEnvarWithDefault "GRAPHQL_API" "https://livenet-api.pixura.io/graphql"
+getGraphQlApiUrl = getEnVarWithDefault "GRAPHQL_API" "https://livenet-api.pixura.io/graphql"
+
+-------------------------------------------------------------------------------
+-- | getPixuraApiKey
+-------------------------------------------------------------------------------
+-- | Looks up the environment variable PIXURA_API_KEY 
+getPixuraApiKey
+  :: forall m. 
+     MonadEffect m
+  => m String
+getPixuraApiKey = getEnVarWithDefault "PIXURA_API_KEY" "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhlbGxvQHBpeHVyYS5pbyIsImlhdCI6MTU0OTMwOTYzNH0.8vk_lFmJlsxSpLo2wi32EAsdFkqcHSTKcWhXMdFBN-E"
 
 -------------------------------------------------------------------------------
 -- | getEnvarWithDefault
 -------------------------------------------------------------------------------
 -- | Looks up the environment variable and returns the supplied default value 
 -- | if it was not found. 
-getEnvarWithDefault
+getEnVarWithDefault
   :: forall m. 
      MonadEffect m
   => String 
   -> String 
   -> m String
-getEnvarWithDefault varName def = maybe def identity <$> (liftEffect $ lookupEnv varName)
+getEnVarWithDefault varName def = maybe def identity <$> (liftEffect $ lookupEnv varName)

@@ -8,8 +8,8 @@ import Effect.Aff (joinFiber, throwError)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Uncurried (EffectFn1, mkEffectFn1)
 import Relayer.Errors (RelayerError(..))
-import Relayer.Queries (buildInsertEthereumAddress)
-import Relayer.Types (EthereumAddress, GraphQlQueryResponse(..), InsertEthereumAddressResponse, runRelayer, fromAff, Promise)
+import Relayer.Queries (buildInsertEthereumAddress, InsertEthereumAddressResponse)
+import Relayer.Types (EthereumAddress, Promise, fromAff, runRelayer)
 import Relayer.Utils (queryGraphQlApi)
 
 
@@ -24,10 +24,13 @@ insertEthereumAddress
   =>  EthereumAddress 
   -> m InsertEthereumAddressResponse
 insertEthereumAddress ea = do
-  GraphQlQueryResponse gqlRes <- queryGraphQlApi (buildInsertEthereumAddress ea)
+
+  gqlRes <- queryGraphQlApi (buildInsertEthereumAddress ea)
   case gqlRes.data of
     Nothing -> throwError <<< GraphQlNoDataError $ show gqlRes.errors
-    Just insertRes -> pure insertRes
+    Just insertRes -> case gqlRes.errors of
+      Nothing -> pure insertRes
+      Just errors -> throwError <<< GraphQlShouldNotError $ show errors
 
 
 

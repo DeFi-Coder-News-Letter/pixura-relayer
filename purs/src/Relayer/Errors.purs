@@ -22,6 +22,7 @@ data RelayerError = InvalidJsonBody String
                   | HttpResponseFormatError String
                   | HttpConnectionError String
                   | GraphQlNoDataError String
+                  | GraphQlShouldNotError String
 
 derive instance eqRelayerError :: Eq RelayerError
 derive instance genericRelayerError :: Generic RelayerError _
@@ -39,3 +40,4 @@ handleError (HttpResponseFormatError err) = throwError <<< error $ "Failed to fo
 handleError (HttpConnectionError err) = throwError <<< error $ "Failed to connect to remote host: " <> err
 handleError (InvalidJsonBody err) = throwError <<< error $ "Failed to parse Json body: " <> err
 handleError (GraphQlNoDataError err) = throwError <<< error $ "No data field returned from GraphQlQuery, errors found: " <> err
+handleError (GraphQlShouldNotError err) = throwError <<< error $ "Found errors in a response that does not permit errors, errors found: " <> err

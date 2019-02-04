@@ -19,16 +19,16 @@
     "purescript-prelude": "^4.1.0",
     "purescript-effect": "^2.0.1",
     "purescript-aff": "^5.1.0",
-    "purescript-argonaut": "^5.0.0",
     "purescript-affjax": "^7.0.1",
     "purescript-prettier": "^0.2.0",
     "purescript-node-fs-aff": "^6.0.0",
-    "purescript-generics-rep": "^6.1.1",
     "purescript-exceptions": "^4.0.0",
-    "purescript-argonaut-generic": "^4.0.0",
     "purescript-aff-promise": "^2.0.1",
     "purescript-has-js-rep": "^0.1.0",
-    "purescript-node-process": "^6.0.0"
+    "purescript-node-process": "^6.0.0",
+    "purescript-simple-json": "^4.4.0",
+    "purescript-argonaut": "^5.0.0",
+    "purescript-argonaut-generic": "^4.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"

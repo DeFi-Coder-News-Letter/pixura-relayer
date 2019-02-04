@@ -1,15 +1,27 @@
-module Relayer.Queries (buildInsertEthereumAddress) where
+module Relayer.Queries (buildInsertEthereumAddress, InsertEthereumAddressResponse) where
 
 import Prelude
+
+import Data.Maybe (Maybe)
+import Data.Nullable (Nullable)
+import Relayer.Types (GQLBody(..), GraphQlQuery(..))
+import Relayer.Utils (wrapDoubleQuotes)
 import Type.Proxy (Proxy(..))
 
-import Relayer.Types (GQLBody(..), GraphQlQuery(..), InsertEthereumAddressResponse)
-
-wrapDoubleQuotes :: String -> String
-wrapDoubleQuotes str = "\"" <> str <> "\""
+-------------------------------------------------------------------------------
+-- | InsertEthereumAddressResponse
+-------------------------------------------------------------------------------
+type InsertEthereumAddressResponse = {
+  createEthereumAddress :: Nullable {
+    ethereumAddress :: {
+      address :: String,
+      createdAt :: String
+    }
+  }
+}
 
 buildInsertEthereumAddress :: forall r. { address :: String | r} -> GraphQlQuery InsertEthereumAddressResponse
-buildInsertEthereumAddress o = GraphQlQuery (GQLBody { query: query }) (Proxy :: Proxy InsertEthereumAddressResponse)
+buildInsertEthereumAddress o = GraphQlQuery { query: query } (Proxy :: Proxy InsertEthereumAddressResponse)
   where
     query = """
     mutation {
