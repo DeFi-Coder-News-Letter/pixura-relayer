@@ -23,6 +23,8 @@ data RelayerError = InvalidJsonBody String
                   | HttpConnectionError String
                   | GraphQlNoDataError String
                   | GraphQlShouldNotError String
+                  | NotValidEthereumAddress String
+                  | InvalidSignedOrder String
 
 derive instance eqRelayerError :: Eq RelayerError
 derive instance genericRelayerError :: Generic RelayerError _
@@ -41,3 +43,6 @@ handleError (HttpConnectionError err) = throwError <<< error $ "Failed to connec
 handleError (InvalidJsonBody err) = throwError <<< error $ "Failed to parse Json body: " <> err
 handleError (GraphQlNoDataError err) = throwError <<< error $ "No data field returned from GraphQlQuery, errors found: " <> err
 handleError (GraphQlShouldNotError err) = throwError <<< error $ "Found errors in a response that does not permit errors, errors found: " <> err
+handleError (NotValidEthereumAddress err) = throwError <<< error $ "Invalid ethereum address. Must be a 40 character hex string: " <> err
+handleError (InvalidSignedOrder err) = throwError <<< error $ "Invalid signed order: " <> err
+

@@ -1,5 +1,6 @@
 module Relayer.Types 
   ( SignedOrder(..)
+  , UnsafeSignedOrder(..)
   , EthereumAddress(..)
   , GQLBody(..)
   , GraphQlQuery(..)
@@ -14,14 +15,9 @@ module Relayer.Types
 
 import Prelude
 
-import Affjax.RequestBody (RequestBody(..))
 import Control.Monad.Error.Class (class MonadError, class MonadThrow)
 import Control.Monad.Except (ExceptT, runExceptT)
-import Control.Promise (fromAff)
 import Control.Promise as Promise
-import Data.Argonaut (class DecodeJson, class EncodeJson)
-import Data.Argonaut.Decode.Generic.Rep (genericDecodeJson)
-import Data.Argonaut.Encode.Generic.Rep (genericEncodeJson)
 import Data.Either (either)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Eq (genericEq)
@@ -32,7 +28,9 @@ import Effect.Aff (Aff, Fiber, launchAff)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect)
 import HasJSRep (class HasJSRep)
-import HasJSRep (class HasJSRep)
+import Network.Ethereum.Core.BigNumber (BigNumber)
+import Network.Ethereum.Core.HexString (HexString)
+import Network.Ethereum.Core.Signatures (Address)
 import OhYes (class HasTSRep, toTSRep)
 import Relayer.Errors (RelayerError, handleError)
 import Type.Proxy (Proxy(..))
@@ -59,12 +57,47 @@ runRelayer (Relayer f) = launchAff (errH =<< (runExceptT f))
 
 
 -------------------------------------------------------------------------------
+-- | UnsafeSignedOrder
+-------------------------------------------------------------------------------
+-- | Signed order with using javascript types for properties
+type UnsafeSignedOrder = {
+  hash :: String,
+  senderAddress :: String,
+  makerAddress :: String,
+  takerAddress :: String,
+  makerAssetData :: String,
+  takerAssetData :: String,
+  exchangeAddress :: String,
+  feeRecipientAddress :: String,
+  expirationTimeSeconds :: Number,
+  makerFee :: String,
+  takerFee :: String,
+  makerAssetAmount :: String,
+  takerAssetAmount :: String,
+  salt :: String,
+  signature :: String
+}
+
+-------------------------------------------------------------------------------
 -- | SignedOrder
 -------------------------------------------------------------------------------
 type SignedOrder = {
-    hi :: String
+  hash :: HexString,
+  senderAddress :: Address,
+  makerAddress :: Address,
+  takerAddress :: Address,
+  makerAssetData :: HexString,
+  takerAssetData :: HexString,
+  exchangeAddress :: Address,
+  feeRecipientAddress :: Address,
+  expirationTimeSeconds :: Number,
+  makerFee :: BigNumber,
+  takerFee :: BigNumber,
+  makerAssetAmount :: BigNumber,
+  takerAssetAmount :: BigNumber,
+  salt :: BigNumber,
+  signature :: HexString
 }
-
 -------------------------------------------------------------------------------
 -- | EthereumAddress
 -------------------------------------------------------------------------------
@@ -103,6 +136,7 @@ type GraphQlQueryResponseError =  {
   },
   path :: Array String
 }
+
 -------------------------------------------------------------------------------
 -- | GraphQlQueryResponse
 -------------------------------------------------------------------------------
@@ -112,22 +146,10 @@ type GraphQlQueryResponse a =  {
 }
 
 
--- derive instance genericInsertEthereumAddressResponse :: Generic InsertEthereumAddressResponse _
-
--- instance showInsertEthereumAddressResponse :: Show InsertEthereumAddressResponse where
---   show = genericShow
-
--- instance eqInsertEthereumAddressResponse ::  Eq InsertEthereumAddressResponse  where
---   eq = genericEq
-
--- instance encodeJsonInsertEthereumAddressResponse :: EncodeJson InsertEthereumAddressResponse where
---   encodeJson a = genericEncodeJson a
--- instance decodeJsonInsertEthereumAddressResponse :: DecodeJson InsertEthereumAddressResponse where
---   decodeJson a = genericDecodeJson a
--- instance hasJSRepEthereumAddressResponse :: HasJSRep InsertEthereumAddressResponse
--- derive newtype instance hasTSRepEthereumAddressResponse :: HasTSRep InsertEthereumAddressResponse
-
-
+-------------------------------------------------------------------------------
+-- | Promise
+-------------------------------------------------------------------------------
+-- | Wrapper for Promise.Promise type for creating typescript types
 newtype Promise a = Promise (Promise.Promise a)
 
 instance hasJSRepPromise :: (HasJSRep a) => HasJSRep (Promise a)

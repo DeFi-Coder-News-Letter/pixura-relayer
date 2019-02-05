@@ -1,10 +1,17 @@
-module Relayer.Queries (buildInsertEthereumAddress, InsertEthereumAddressResponse) where
+module Relayer.Queries 
+  ( buildInsertEthereumAddressQuery
+  , InsertEthereumAddressResponse
+  , buildInsertSignedOrderQuery
+  , InsertSignedOrderResponse
+  ) where
 
 import Prelude
 
-import Data.Maybe (Maybe)
 import Data.Nullable (Nullable)
-import Relayer.Types (GQLBody(..), GraphQlQuery(..))
+import Network.Ethereum.Core.BigNumber (decimal, toString)
+import Network.Ethereum.Core.HexString (unHex)
+import Network.Ethereum.Core.Signatures (Address, unAddress)
+import Relayer.Types (GraphQlQuery(..), SignedOrder)
 import Relayer.Utils (wrapDoubleQuotes)
 import Type.Proxy (Proxy(..))
 
@@ -19,16 +26,19 @@ type InsertEthereumAddressResponse = {
     }
   }
 }
-
-buildInsertEthereumAddress :: forall r. { address :: String | r} -> GraphQlQuery InsertEthereumAddressResponse
-buildInsertEthereumAddress o = GraphQlQuery { query: query } (Proxy :: Proxy InsertEthereumAddressResponse)
+-------------------------------------------------------------------------------
+-- | buildInsertEthereumAddressQuery
+-------------------------------------------------------------------------------
+buildInsertEthereumAddressQuery :: forall r. { address :: Address | r} -> GraphQlQuery InsertEthereumAddressResponse
+buildInsertEthereumAddressQuery { address } = GraphQlQuery { query: query } (Proxy :: Proxy InsertEthereumAddressResponse)
   where
+    address' = unHex <<< unAddress $ address
     query = """
     mutation {
       createEthereumAddress(
         input: {
           ethereumAddress: {
-            address:""" <> wrapDoubleQuotes o.address <> """
+            address:""" <> wrapDoubleQuotes address' <> """
           }
         }
       ) {
@@ -40,35 +50,66 @@ buildInsertEthereumAddress o = GraphQlQuery { query: query } (Proxy :: Proxy Ins
     }
     """
 
--- buildInsertEthereumAddress :: forall i. (address :: String | i) -> GraphQlQuery GQLBody  r
--- buildInsertEthereumAddress address = print (query address)
---   where
---     query = s """
---     mutation {
---       createSignedOrder(
---         input: {
---           signedOrder: {
---             hash: "", 
---             senderAddress: "", 
---             makerAddress: "", 
---             takerAddress: "", 
---             makerAssetData: "", 
---             takerAssetData: "", 
---             exchangeAddress: "", 
---             feeRecipientAddress: "", 
---             expirationTimeSeconds: 10, 
---             makerFee: 1.5, 
---             takerFee: 1.5, 
---             makerAssetAmount: 1.5, 
---             takerAssetAmount: 1.5, 
---             salt: "", 
---             signature: ""
---           }
---         }
---       ) {
---         signedOrder {
---           hash
---         }
---       }
---     }
---     """
+
+-------------------------------------------------------------------------------
+-- | InsertSignedOrderResponse
+-------------------------------------------------------------------------------
+type InsertSignedOrderResponse = {
+  createSignedOrder :: Nullable {
+    signedOrder :: {
+      hash :: String
+    }
+  }
+}
+-------------------------------------------------------------------------------
+-- | buildInsertSignedOrderQuery
+-------------------------------------------------------------------------------
+buildInsertSignedOrderQuery :: SignedOrder -> GraphQlQuery  InsertSignedOrderResponse
+buildInsertSignedOrderQuery so = GraphQlQuery { query: query } (Proxy :: Proxy InsertSignedOrderResponse)
+  where
+    hash = hexToWrappedString so.hash
+    senderAddress = addressToWrappedString so.senderAddress
+    makerAddress = addressToWrappedString so.makerAddress
+    takerAddress = addressToWrappedString so.takerAddress
+    makerAssetData = hexToWrappedString so.makerAssetData
+    takerAssetData = hexToWrappedString so.takerAssetData
+    exchangeAddress = addressToWrappedString so.exchangeAddress
+    feeRecipientAddress = addressToWrappedString so.feeRecipientAddress
+    expirationTimeSeconds = show so.expirationTimeSeconds
+    makerFee = toString decimal so.makerFee
+    takerFee = toString decimal so.takerFee
+    makerAssetAmount = toString decimal so.makerAssetAmount
+    takerAssetAmount = toString decimal so.takerAssetAmount
+    salt = toString decimal so.salt
+    signature = hexToWrappedString so.signature
+    query = """
+    mutation {
+      createSignedOrder(
+        input: {
+          signedOrder: {
+            hash: """ <> hash <> """, 
+            senderAddress: """ <> senderAddress <>""", 
+            makerAddress: """ <> makerAddress <> """, 
+            takerAddress: """ <> takerAddress <> """, 
+            makerAssetData: """ <> makerAssetData <> """, 
+            takerAssetData: """ <> takerAssetData <> """, 
+            exchangeAddress: """ <> exchangeAddress <> """, 
+            feeRecipientAddress: """ <> feeRecipientAddress <> """, 
+            expirationTimeSeconds: """ <> expirationTimeSeconds <> """, 
+            makerFee: """ <> makerFee <> """, 
+            takerFee: """ <> takerFee <> """, 
+            makerAssetAmount: """ <> makerAssetAmount <> """, 
+            takerAssetAmount: """ <> takerAssetAmount <> """, 
+            salt: """ <> salt <> """, 
+            signature: """ <> signature <> """
+          }
+        }
+      ) {
+        signedOrder {
+          hash
+        }
+      }
+    }
+    """
+    hexToWrappedString = wrapDoubleQuotes <<< unHex
+    addressToWrappedString = hexToWrappedString <<< unAddress

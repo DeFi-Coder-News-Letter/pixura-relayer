@@ -4,14 +4,6 @@ import * as _ from 'lodash';
 
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 
-import { insertEthereumAddressFn } from './purs/Types';
-import * as Pixura from './purs/Relayer.Pixura';
-
-const insertEthereumAddress = Pixura.insertEtherAddressFn as insertEthereumAddressFn;
-
-insertEthereumAddress({ address: '' })
-    .then(console.log)
-    .catch(console.log);
 const schemaValidator = new SchemaValidator();
 
 export const utils = {

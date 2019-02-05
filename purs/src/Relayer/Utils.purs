@@ -1,4 +1,9 @@
-module Relayer.Utils (queryGraphQlApi, post, wrapDoubleQuotes) where
+module Relayer.Utils 
+  ( queryGraphQlApi
+  , post
+  , wrapDoubleQuotes
+  , stringToAddress
+  ) where
 
 import Prelude
 
@@ -11,11 +16,12 @@ import Affjax.StatusCode (StatusCode(..))
 import Control.Monad.Error.Class (class MonadThrow, try)
 import Data.Either (Either(..), either)
 import Data.HTTP.Method (Method(..))
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.MediaType (MediaType(..))
 import Effect.Aff (throwError)
 import Effect.Aff.Class (class MonadAff, liftAff)
-import Prelude (bind, flip, otherwise, pure, show, ($), (&&), (<), (<<<), (<>), (=<<), (>=))
+import Network.Ethereum.Core.HexString (mkHexString)
+import Network.Ethereum.Core.Signatures (Address, mkAddress)
 import Relayer.Config (getGraphQlApiUrl, getPixuraApiKey)
 import Relayer.Errors (RelayerError(..))
 import Relayer.Types (GraphQlQuery(..), GraphQlQueryResponse)
@@ -99,3 +105,12 @@ statusOk (StatusCode n) = n >= 200 && n < 300
 --   queries.
 wrapDoubleQuotes :: String -> String
 wrapDoubleQuotes str = "\"" <> str <> "\""
+
+-------------------------------------------------------------------------------
+-- | stringToAddress
+-------------------------------------------------------------------------------
+-- | Util function to turn a string into an Ethereum Address. Throws on failure.
+stringToAddress :: String -> Either RelayerError Address
+stringToAddress address =   
+  let mAddress  = mkAddress =<< mkHexString address
+  in maybe (Left $ NotValidEthereumAddress address) Right mAddress

@@ -4,15 +4,12 @@ module Generate (main) where
 import Prelude
 
 import Data.Foldable (intercalate)
-import Data.Function.Uncurried (Fn1)
 import Effect (Effect)
-import Effect.Uncurried (EffectFn1)
 import Node.Encoding (Encoding(..))
 import Node.FS.Sync (writeTextFile)
 import OhYes (generateTS)
-import Relayer.Pixura (insertEtherAddressFn)
-import Relayer.Queries (InsertEthereumAddressResponse)
-import Relayer.Types (EthereumAddress, Promise(..), SignedOrder)
+import Relayer.Queries (InsertEthereumAddressResponse, InsertSignedOrderResponse)
+import Relayer.Types (EthereumAddress, Promise, UnsafeSignedOrder)
 import Text.Prettier (defaultOptions, format)
 import Type.Proxy (Proxy(..))
 
@@ -22,8 +19,11 @@ main = do
   where
     values = format defaultOptions $ intercalate "\n"
       [ 
-        generateTS "SignedOrder" (Proxy :: Proxy SignedOrder)
-      , generateTS "EthereumAddress" (Proxy :: Proxy EthereumAddress)
+        generateTS "EthereumAddress" (Proxy :: Proxy EthereumAddress)
       , generateTS "InsertEthereumAddressResponse" (Proxy :: Proxy InsertEthereumAddressResponse)
       , generateTS "insertEthereumAddressFn" (Proxy :: Proxy (EthereumAddress -> (Promise InsertEthereumAddressResponse)))
+      
+      , generateTS "SignedOrder" (Proxy :: Proxy UnsafeSignedOrder)
+      , generateTS "InsertSignedOrderResponse" (Proxy :: Proxy InsertSignedOrderResponse)
+      , generateTS "insertSignedOrderFn" (Proxy :: Proxy (UnsafeSignedOrder -> (Promise InsertSignedOrderResponse)))
       ]

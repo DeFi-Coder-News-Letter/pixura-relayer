@@ -27,6 +27,11 @@ import { SignedOrderModel } from './models/SignedOrderModel';
 import { paginate } from './paginator';
 import { utils } from './utils';
 
+import * as Pixura from './purs/Relayer.Pixura';
+import { insertSignedOrderFn } from './purs/Types';
+
+const insertSignedOrderFn = Pixura.insertSignedOrderFn as insertSignedOrderFn;
+
 export class OrderBook {
     private readonly _orderWatcher: OrderWatcher;
     private readonly _contractWrappers: ContractWrappers;
@@ -155,11 +160,10 @@ export class OrderBook {
         }
     }
     public async addOrderAsync(signedOrder: SignedOrder): Promise<void> {
-        const connection = getDBConnection();
         await this._contractWrappers.exchange.validateOrderFillableOrThrowAsync(signedOrder);
         await this._orderWatcher.addOrderAsync(signedOrder);
         const signedOrderModel = serializeOrder(signedOrder);
-        await connection.manager.save(signedOrderModel);
+        await insertSignedOrderFn(signedOrderModel);
     }
     public async getOrderBookAsync(
         page: number,
@@ -304,7 +308,7 @@ const deserializeOrder = (signedOrderModel: Required<SignedOrderModel>): SignedO
 };
 
 const serializeOrder = (signedOrder: SignedOrder): SignedOrderModel => {
-    const signedOrderModel = new SignedOrderModel({
+    const signedOrderModel = {
         signature: signedOrder.signature,
         senderAddress: signedOrder.senderAddress,
         makerAddress: signedOrder.makerAddress,
@@ -320,6 +324,6 @@ const serializeOrder = (signedOrder: SignedOrder): SignedOrderModel => {
         feeRecipientAddress: signedOrder.feeRecipientAddress,
         expirationTimeSeconds: signedOrder.expirationTimeSeconds.toNumber(),
         hash: orderHashUtils.getOrderHashHex(signedOrder),
-    });
+    };
     return signedOrderModel;
 };
