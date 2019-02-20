@@ -1,37 +1,29 @@
 {
-  "name": "pixura-relayer",
-  "description": "Pixura 0x relayer",
-  "main": "",
-  "authors": [
-    "Charles Crain (charles@pixura.io)"
-  ],
-  "license": "Apache-2.0",
-  "homepage": "https://github.com/Pixura/pixura-backend",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "purescript-ohyes": "^2.0.0",
-    "purescript-prelude": "^4.1.0",
-    "purescript-effect": "^2.0.1",
-    "purescript-aff": "^5.1.0",
-    "purescript-affjax": "^7.0.1",
-    "purescript-prettier": "^0.2.0",
-    "purescript-node-fs-aff": "^6.0.0",
-    "purescript-exceptions": "^4.0.0",
-    "purescript-aff-promise": "^2.0.1",
-    "purescript-has-js-rep": "^0.1.0",
-    "purescript-node-process": "^6.0.0",
-    "purescript-simple-json": "^4.4.0",
-    "purescript-argonaut": "^5.0.0",
-    "purescript-argonaut-generic": "^4.0.0",
-    "purescript-eth-core": "https://github.com/charlescrain/purescript-eth-core.git#master"
-  },
-  "devDependencies": {
-    "purescript-psci-support": "^4.0.0"
-  }
+    "name": "pixura-relayer",
+    "description": "Pixura 0x relayer",
+    "main": "",
+    "authors": ["Charles Crain (charles@pixura.io)"],
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/Pixura/pixura-relayer",
+    "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
+    "dependencies": {
+        "purescript-ohyes": "^2.0.0",
+        "purescript-prelude": "^4.1.0",
+        "purescript-effect": "^2.0.1",
+        "purescript-aff": "^5.1.0",
+        "purescript-affjax": "^7.0.1",
+        "purescript-prettier": "^0.2.0",
+        "purescript-node-fs-aff": "^6.0.0",
+        "purescript-exceptions": "^4.0.0",
+        "purescript-aff-promise": "^2.0.1",
+        "purescript-has-js-rep": "^0.1.0",
+        "purescript-node-process": "^6.0.0",
+        "purescript-simple-json": "^4.4.0",
+        "purescript-argonaut": "^5.0.0",
+        "purescript-argonaut-generic": "^4.0.0",
+        "purescript-eth-core": "https://github.com/charlescrain/purescript-eth-core.git#master"
+    },
+    "devDependencies": {
+        "purescript-psci-support": "^4.0.0"
+    }
 }
