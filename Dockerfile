@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY package.json ./
 COPY yarn.lock ./
+COPY bower.json ./
 
 RUN yarn --frozen-lockfile
 RUN yarn global add forever

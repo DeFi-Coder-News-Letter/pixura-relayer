@@ -18,7 +18,7 @@
         "watch:purs": "mkdir -p ./ts/src/purs && pulp --watch build --src-path ./purs/src/ -o ./ts/src/purs/",
         "prettier:ts": "prettier --write 'ts/**/*.ts' --config .prettierrc",
         "start:ts": "node -r dotenv/config ts/lib/index.js",
-        "postinstall": "bower install",
+        "postinstall": "bower install --allow-root",
         "lint:ts": "tslint --project ts --format stylish"
     },
     "devDependencies": {
@@ -59,6 +59,7 @@
         "lodash": "^4.17.11",
         "pg": "^7.8.0",
         "pulp": "^12.3.1",
+        "purescript": "^0.12.2",
         "reflect-metadata": "^0.1.10",
         "sqlite3": "^4.0.2",
         "typeorm": "0.2.7"
