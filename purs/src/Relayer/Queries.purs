@@ -9,6 +9,7 @@ import Prelude
 
 import Data.Nullable (Nullable)
 import Network.Ethereum.Core.BigNumber (decimal, toString)
+import Network.Ethereum.Core.HexString (HexString)
 import Network.Ethereum.Core.Signatures (Address)
 import Relayer.Types (GraphQlQuery(..), SignedOrder)
 import Relayer.Utils (addressToString, hexStringToString, wrapDoubleQuotes)
@@ -31,13 +32,13 @@ type InsertEthereumAddressResponse = {
 buildInsertEthereumAddressQuery :: forall r. { address :: Address | r} -> GraphQlQuery InsertEthereumAddressResponse
 buildInsertEthereumAddressQuery { address } = GraphQlQuery { query: query } (Proxy :: Proxy InsertEthereumAddressResponse)
   where
-    address' = addressToString $ address
+    address' = addressToWrappedString $ address
     query = """
     mutation {
       createEthereumAddress(
         input: {
           ethereumAddress: {
-            address:""" <> wrapDoubleQuotes address' <> """
+            address:""" <> address' <> """
           }
         }
       ) {
@@ -110,5 +111,12 @@ buildInsertSignedOrderQuery so = GraphQlQuery { query: query } (Proxy :: Proxy I
       }
     }
     """
-    hexToWrappedString = wrapDoubleQuotes <<< hexStringToString
-    addressToWrappedString = wrapDoubleQuotes <<< addressToString
+
+-------------------------------------------------------------------------------
+-- | Utils
+-------------------------------------------------------------------------------
+hexToWrappedString :: HexString -> String
+hexToWrappedString = wrapDoubleQuotes <<< hexStringToString
+
+addressToWrappedString :: Address -> String
+addressToWrappedString = wrapDoubleQuotes <<< addressToString
