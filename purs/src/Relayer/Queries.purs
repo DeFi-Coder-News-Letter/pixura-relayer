@@ -9,10 +9,9 @@ import Prelude
 
 import Data.Nullable (Nullable)
 import Network.Ethereum.Core.BigNumber (decimal, toString)
-import Network.Ethereum.Core.HexString (unHex)
-import Network.Ethereum.Core.Signatures (Address, unAddress)
+import Network.Ethereum.Core.Signatures (Address)
 import Relayer.Types (GraphQlQuery(..), SignedOrder)
-import Relayer.Utils (wrapDoubleQuotes)
+import Relayer.Utils (addressToString, hexStringToString, wrapDoubleQuotes)
 import Type.Proxy (Proxy(..))
 
 -------------------------------------------------------------------------------
@@ -32,7 +31,7 @@ type InsertEthereumAddressResponse = {
 buildInsertEthereumAddressQuery :: forall r. { address :: Address | r} -> GraphQlQuery InsertEthereumAddressResponse
 buildInsertEthereumAddressQuery { address } = GraphQlQuery { query: query } (Proxy :: Proxy InsertEthereumAddressResponse)
   where
-    address' = unHex <<< unAddress $ address
+    address' = addressToString $ address
     query = """
     mutation {
       createEthereumAddress(
@@ -80,7 +79,7 @@ buildInsertSignedOrderQuery so = GraphQlQuery { query: query } (Proxy :: Proxy I
     takerFee = toString decimal so.takerFee
     makerAssetAmount = toString decimal so.makerAssetAmount
     takerAssetAmount = toString decimal so.takerAssetAmount
-    salt = toString decimal so.salt
+    salt = wrapDoubleQuotes $ toString decimal so.salt
     signature = hexToWrappedString so.signature
     query = """
     mutation {
@@ -111,5 +110,5 @@ buildInsertSignedOrderQuery so = GraphQlQuery { query: query } (Proxy :: Proxy I
       }
     }
     """
-    hexToWrappedString = wrapDoubleQuotes <<< unHex
-    addressToWrappedString = hexToWrappedString <<< unAddress
+    hexToWrappedString = wrapDoubleQuotes <<< hexStringToString
+    addressToWrappedString = wrapDoubleQuotes <<< addressToString

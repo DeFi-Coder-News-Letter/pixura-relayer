@@ -4,7 +4,7 @@ import Prelude
 
 import Control.Monad.Error.Class (class MonadError, class MonadThrow, catchError)
 import Data.Either (either)
-import Data.Int (decimal)
+import Data.Int (ceil, decimal)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Traversable (sequence)
 import Effect.Aff (joinFiber, throwError)
@@ -107,7 +107,7 @@ insertSignedOrder uso = do
         <*> mkHexString o.takerAssetData
         <*> (mkAddress =<< mkHexString o.exchangeAddress)
         <*> (mkAddress =<< mkHexString o.feeRecipientAddress)
-        <*> pure o.expirationTimeSeconds
+        <*> pure (ceil o.expirationTimeSeconds)
         <*> parseBigNumber decimal o.makerFee
         <*> parseBigNumber decimal o.takerFee
         <*> parseBigNumber decimal o.makerAssetAmount

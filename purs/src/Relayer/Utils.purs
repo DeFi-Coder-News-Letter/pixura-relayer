@@ -3,6 +3,8 @@ module Relayer.Utils
   , post
   , wrapDoubleQuotes
   , stringToAddress
+  , hexStringToString
+  , addressToString
   ) where
 
 import Prelude
@@ -20,8 +22,8 @@ import Data.Maybe (Maybe(..), maybe)
 import Data.MediaType (MediaType(..))
 import Effect.Aff (throwError)
 import Effect.Aff.Class (class MonadAff, liftAff)
-import Network.Ethereum.Core.HexString (mkHexString)
-import Network.Ethereum.Core.Signatures (Address, mkAddress)
+import Network.Ethereum.Core.HexString (HexString, mkHexString, unHex)
+import Network.Ethereum.Core.Signatures (Address, mkAddress, unAddress)
 import Relayer.Config (getGraphQlApiUrl, getPixuraApiKey)
 import Relayer.Errors (RelayerError(..))
 import Relayer.Types (GraphQlQuery(..), GraphQlQueryResponse)
@@ -114,3 +116,16 @@ stringToAddress :: String -> Either RelayerError Address
 stringToAddress address =   
   let mAddress  = mkAddress =<< mkHexString address
   in maybe (Left $ NotValidEthereumAddress address) Right mAddress
+
+-------------------------------------------------------------------------------
+-- | hexStringToString
+-------------------------------------------------------------------------------
+-- | Util function to turn a HexString into a string. 
+hexStringToString :: HexString -> String
+hexStringToString = ((<>) "0x"  ) <<< unHex
+-------------------------------------------------------------------------------
+-- | addressToString
+-------------------------------------------------------------------------------
+-- | Util function to turn an Address into a String.
+addressToString :: Address -> String
+addressToString =  hexStringToString <<< unAddress

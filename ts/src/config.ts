@@ -81,15 +81,15 @@ function assertEnvVarType(name: string, value: any, expectedType: EnvVarType): a
         case EnvVarType.UnitAmount:
             try {
                 returnValue = new BigNumber(parseFloat(value));
-                if (returnValue.isNegative) {
+                if (returnValue.isNegative && !returnValue.isZero) {
                     throw new Error();
                 }
             } catch (err) {
-                throw new Error(`${name} must be valid number greater than 0.`);
+                throw new Error(`${name} must be valid number greater than or equal to 0. Got ${value}.`);
             }
             return returnValue;
         default:
-            throw new Error(`Unrecognised EnvVarType: ${expectedType} encountered for variable ${name}.`);
+            throw new Error(`Unrecognised EnvVarType: ${expectedType} encountered for variable ${name}. Got ${value}`);
     }
 }
 function getDefaultFeeRecipient(): string {

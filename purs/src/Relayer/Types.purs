@@ -10,6 +10,7 @@ module Relayer.Types
   , runRelayer
   , Promise(..)
   , fromAff
+  -- , Address
   ) where
 
 
@@ -90,7 +91,7 @@ type SignedOrder = {
   takerAssetData :: HexString,
   exchangeAddress :: Address,
   feeRecipientAddress :: Address,
-  expirationTimeSeconds :: Number,
+  expirationTimeSeconds :: Int,
   makerFee :: BigNumber,
   takerFee :: BigNumber,
   makerAssetAmount :: BigNumber,
@@ -160,3 +161,31 @@ instance hasTSRepPromise :: (HasTSRep a) => HasTSRep (Promise a) where
 
 fromAff :: forall a. Aff a -> Effect (Promise a)
 fromAff = map Promise <<< Promise.fromAff
+
+-- -------------------------------------------------------------------------------
+-- -- | Address
+-- -------------------------------------------------------------------------------
+-- newtype Address = Address Eth.Address
+
+-- derive newtype instance addressShow :: Show Address
+-- derive newtype instance addressEq :: Eq Address
+-- derive newtype instance addressOrd :: Ord Address
+-- derive newtype instance encodeAddress :: Encode Address
+-- derive newtype instance decodeAddress :: Decode Address where
+--   decode a = do
+--     hxString <- decode a
+--     either (fail <<< ForeignError) pure $ _decode hxString
+
+-- instance decodeJsonAddress :: A.DecodeJson Address where
+--   decodeJson json = do
+--     hxString <- A.decodeJson json
+--     _decode hxString
+
+-- instance encodeJsonAddress :: A.EncodeJson Address where
+--   encodeJson = A.encodeJson <<< unAddress
+
+-- instance readFAddress :: ReadForeign Address where
+--   readImpl = decode
+
+-- instance writeFAddress :: WriteForeign Address where
+--   writeImpl = encode
