@@ -43,7 +43,7 @@ export const RPC_URL = _.isEmpty(process.env.RPC_URL)
     : assertEnvVarType('RPC_URL', process.env.RPC_URL, EnvVarType.Url);
 
 // A time window after which the order is considered permanently expired
-export const ORDER_SHADOWING_MARGIN_MS = 100 * 1000; // tslint:disable-line custom-no-magic-numbers
+export const ORDER_SHADOWING_MARGIN_MS = 2 * 1000; // tslint:disable-line custom-no-magic-numbers
 // Frequency of checks for permanently expired orders
 export const PERMANENT_CLEANUP_INTERVAL_MS = 2 * 1000; // tslint:disable-line custom-no-magic-numbers
 // Max number of entities per page
