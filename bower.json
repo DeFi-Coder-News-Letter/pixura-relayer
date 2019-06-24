@@ -7,7 +7,7 @@
     "homepage": "https://github.com/Pixura/pixura-relayer",
     "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
     "dependencies": {
-        "purescript-ohyes": "^2.0.0",
+        "purescript-ohyes": "2.0.0",
         "purescript-prelude": "^4.1.0",
         "purescript-effect": "^2.0.1",
         "purescript-aff": "^5.1.0",
