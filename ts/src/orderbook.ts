@@ -163,7 +163,13 @@ export class OrderBook {
         await this._contractWrappers.exchange.validateOrderFillableOrThrowAsync(signedOrder);
         await this._orderWatcher.addOrderAsync(signedOrder);
         const signedOrderModel = serializeOrder(signedOrder);
-        await insertSignedOrderFn(signedOrderModel);
+        try {
+          await insertSignedOrderFn(signedOrderModel);
+        } catch (err) {
+          if (!err.message.includes('violates unique constraint')) {
+            throw err;
+          }
+        }
     }
     public async getOrderBookAsync(
         page: number,
